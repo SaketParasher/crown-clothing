@@ -5,9 +5,14 @@ import { auth } from '../../Firebase/firebase.utils';
 import { Link } from 'react-router-dom';
 import { ReactComponent as Logo} from '../../assets/crown.svg';
 
+import CartIcon from '../CartIcon/CartIcon';
+import CartDropdown from '../CartDropdown/CartDropdown';
+
+import { toggleCartDropdown } from '../../Redux/Actions/cart.action';
+
 import { connect } from 'react-redux';
 
-const Header = ({currentUser}) => {
+const Header = ({currentUser,cartDropdownHidden,toggleDropdown}) => {
     return (
         <div className='header'>
             <Link className='logo-container' to='/'>
@@ -18,17 +23,23 @@ const Header = ({currentUser}) => {
                 <Link className='option' to='/contact'>CONTACT</Link>
                 {
                 currentUser ? 
-                <div className='option' onClick={() => auth.signOut()}>{`LOGOUT, ${currentUser.displayName}`}</div> :
+                <div className='option' onClick={() => auth.signOut()}>{`LOGOUT`}</div> :
                  <Link className='option' to='/signin'>LOGIN</Link>
                  }
-                
+                 <CartIcon handleClick={toggleDropdown}/>
             </div>
+            {!cartDropdownHidden ? <CartDropdown /> : null }
         </div>
     )
 }
 
-const mapStatetoProps = state => ({
-    currentUser:state.user.currentUser
+const mapStatetoProps = ({user,cart}) => ({
+    currentUser:user.currentUser,
+    cartDropdownHidden:cart.dropdownHidden
+});
+
+const mapDispatchToProps = dispatch => ({
+    toggleDropdown : () => dispatch(toggleCartDropdown())
 })
 
-export default connect(mapStatetoProps)(Header);
+export default connect(mapStatetoProps,mapDispatchToProps)(Header);
